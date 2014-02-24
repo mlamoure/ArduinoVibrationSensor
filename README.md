@@ -1,0 +1,1 @@
+This code for an Arduino Uno R3 will compile a JSON message and send the message via Zigbee Xbee to a Coordinator.  I've also contributed a set of coordinator code, which will show how to receive the message and then do something with it.
