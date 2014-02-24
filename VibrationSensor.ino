@@ -3,11 +3,11 @@
 
 // ##################################################################
 // CONFIGURATION
-bool publishRawResults = false;
-int thresholdVibration = 3;
-int thresholdIterations = 10;
-int refreshRate = 3000; // in MS
-String deviceID = "dryer";
+bool publishRawResults = false;  // if set to true, will publish the x, y, z raw values in the JSON message.  Not very useful.
+int thresholdVibration = 3; // amount of vibration that needs to happen on any axis for the vibration sensor to trigger.
+int thresholdIterations = 10; // number of iterations (at the refreshRate) that the vibrations need to be detected (or not) before the Zigbee message is published about a status change.
+int refreshRate = 3000; // in MS, the amount of time between iterations
+String deviceID = "dryer"; // the name of the device, for use in the JSON object that is published in the Zigbee payload
 
 // ##################################################################
 
