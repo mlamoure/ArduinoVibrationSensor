@@ -7,11 +7,12 @@ bool publishRawResults = false;
 int thresholdVibration = 3;
 int thresholdIterations = 10;
 int refreshRate = 3000; // in MS
+String deviceID = "dryer";
 
 // ##################################################################
 
-bool dryerPreviousStatus;
-bool dryerSyncStatus;
+bool previousStatus;
+bool syncStatus;
 int numIterations;
 int previousValues[3];
 
@@ -81,7 +82,7 @@ void outputToConsole(String x, String y, String z) {
 void loop() 
 {	
 	Serial.println("*************************");
-	bool dryerStatus = false;
+	bool vibrationStatus = false;
 	int rawArray[3];
 
 	rawArray[0] = ReadAxis(xInput);
@@ -111,31 +112,31 @@ void loop()
 
 	for (int xyz = 0; xyz < 3; xyz++) {
 		if (rawArray[xyz] - previousValues[xyz] > thresholdVibration ||  previousValues[xyz] - rawArray[xyz] > thresholdVibration) {
-			dryerStatus = true;
+			vibrationStatus = true;
 			previousValues[xyz] = rawArray[xyz];
 		}
 	}
 
 	// Did the dryer status change?
-	if (dryerStatus == dryerPreviousStatus) {
+	if (vibrationStatus == previousStatus) {
 		numIterations++;
 	}
 	else {
 		numIterations = 0;
 	}
 
-	if (dryerStatus != dryerSyncStatus && numIterations >= thresholdIterations) {
-		dryerSyncStatus = dryerStatus;
+	if (vibrationStatus != syncStatus && numIterations >= thresholdIterations) {
+		syncStatus = vibrationStatus;
 
-		String payloadStr = buildJSON(dryerStatus, rawArray);
+		String payloadStr = buildJSON(vibrationStatus, rawArray);
 		publishZWaveTx(payloadStr);
 	}
 
-	dryerPreviousStatus = dryerStatus;
+	previousStatus = vibrationStatus;
 
-	Serial.println("dryerStatus: " + String(dryerStatus));
-	Serial.println("dryerPreviousStatus: " + String(dryerPreviousStatus));
-	Serial.println("dryerSyncStatus: " + String(dryerSyncStatus));
+	Serial.println("vibrationStatus: " + String(vibrationStatus));
+	Serial.println("previousStatus: " + String(previousStatus));
+	Serial.println("syncStatus: " + String(syncStatus));
 	Serial.println("numIterations: " + String(numIterations) + " / " +  String(thresholdIterations));
 
 	Serial.println("*************************");
@@ -152,14 +153,14 @@ void publishZWaveTx(String payloadStr) {
 	xbee.send(zbTx);
 }
 
-String buildJSON(bool dryerStatus, int* rawArray) {
+String buildJSON(bool vibrationStatus, int* rawArray) {
 	String payloadStr;
 
 	payloadStr = "{";
-	payloadStr += "\"id\": \"dryer\",";
+	payloadStr += "\"id\": \"" + deviceID + "\",";
 	payloadStr += "\"status\": ";
 
-	if (dryerStatus) {
+	if (vibrationStatus) {
 		payloadStr += "true";
 	}
 	else
